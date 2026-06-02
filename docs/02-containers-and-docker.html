@@ -610,6 +610,35 @@ aside.sidebar {
       <p>An <strong>image</strong> is a read-only, layered filesystem bundled with metadata describing how to run it (the command, environment, exposed ports). A <strong>container</strong> is a running instance of an image — a normal Linux process, isolated using kernel features (namespaces for what it can see, cgroups for what it can use). The image is the recipe; the container is the meal.</p>
       <p>Both are governed by the <strong>Open Container Initiative (OCI)</strong> specification, which is why an image built with Docker runs identically under containerd, CRI-O, or Podman. Kubernetes does not use Docker to run containers — it talks to an OCI-compliant runtime through the Container Runtime Interface (covered in the architecture chapter). Docker is one way to <em>build</em> images; it is not required to <em>run</em> them.</p>
 
+      <figure>
+        <svg viewBox="0 0 720 130" role="img" aria-labelledby="figlc-title figlc-desc"><style>text{font-family:'Inter',sans-serif;}.t{font-size:14px;fill:#1a1a18;}.ts{font-size:12px;fill:#4a4a45;}.th{font-size:14px;font-weight:500;fill:#1a1a18;}.c-purple>rect,.c-purple>circle,.c-purple>ellipse{fill:#EEEDFE;stroke:#534AB7;}.c-purple>.th,.c-purple>.t{fill:#3C3489;}.c-purple>.ts{fill:#534AB7;}.c-teal>rect,.c-teal>circle,.c-teal>ellipse{fill:#E1F5EE;stroke:#0F6E56;}.c-teal>.th,.c-teal>.t{fill:#085041;}.c-teal>.ts{fill:#0F6E56;}.c-coral>rect,.c-coral>circle,.c-coral>ellipse{fill:#FAECE7;stroke:#993C1D;}.c-coral>.th,.c-coral>.t{fill:#712B13;}.c-coral>.ts{fill:#993C1D;}.c-blue>rect,.c-blue>circle,.c-blue>ellipse{fill:#E6F1FB;stroke:#185FA5;}.c-blue>.th,.c-blue>.t{fill:#0C447C;}.c-blue>.ts{fill:#185FA5;}.c-amber>rect,.c-amber>circle,.c-amber>ellipse{fill:#FAEEDA;stroke:#854F0B;}.c-amber>.th,.c-amber>.t{fill:#633806;}.c-amber>.ts{fill:#854F0B;}.c-red>rect,.c-red>circle,.c-red>ellipse{fill:#FCEBEB;stroke:#A32D2D;}.c-red>.th,.c-red>.t{fill:#791F1F;}.c-red>.ts{fill:#A32D2D;}.c-gray>rect,.c-gray>circle,.c-gray>ellipse{fill:#F1EFE8;stroke:#5F5E5A;}.c-gray>.th,.c-gray>.t{fill:#444441;}.c-gray>.ts{fill:#5F5E5A;}.arr{stroke:#4a4a45;stroke-width:1.5;fill:none;}.leader{stroke:#8a8a82;stroke-width:0.5;stroke-dasharray:3 3;fill:none;}</style>
+          <title id="figlc-title">The container lifecycle Kubernetes manages</title>
+          <desc id="figlc-desc">A Dockerfile builds an image, which is pushed to a registry, pulled and run as a container, and wrapped by Kubernetes in a pod.</desc>
+          <defs><marker id="arr-lc" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+          <g class="c-gray"><rect x="8" y="45" width="116" height="44" rx="8" stroke-width="0.5"/><text class="th" x="66" y="71" text-anchor="middle">Dockerfile</text></g>
+          <g class="c-blue"><rect x="158" y="45" width="116" height="44" rx="8" stroke-width="0.5"/><text class="th" x="216" y="71" text-anchor="middle">Image</text></g>
+          <g class="c-purple"><rect x="308" y="45" width="116" height="44" rx="8" stroke-width="0.5"/><text class="th" x="366" y="71" text-anchor="middle">Registry</text></g>
+          <g class="c-coral"><rect x="458" y="45" width="116" height="44" rx="8" stroke-width="0.5"/><text class="th" x="516" y="71" text-anchor="middle">Container</text></g>
+          <g class="c-teal"><rect x="608" y="45" width="104" height="44" rx="8" stroke-width="0.5"/><text class="th" x="660" y="71" text-anchor="middle">Pod</text></g>
+          <line x1="124" y1="67" x2="156" y2="67" class="arr" marker-end="url(#arr-lc)"/>
+          <line x1="274" y1="67" x2="306" y2="67" class="arr" marker-end="url(#arr-lc)"/>
+          <line x1="424" y1="67" x2="456" y2="67" class="arr" marker-end="url(#arr-lc)"/>
+          <line x1="574" y1="67" x2="606" y2="67" class="arr" marker-end="url(#arr-lc)"/>
+          <text class="ts" x="66" y="108" text-anchor="middle">you write</text>
+          <text class="ts" x="216" y="108" text-anchor="middle">docker build</text>
+          <text class="ts" x="366" y="108" text-anchor="middle">docker push</text>
+          <text class="ts" x="516" y="108" text-anchor="middle">runtime runs</text>
+          <text class="ts" x="660" y="108" text-anchor="middle">Kubernetes wraps</text>
+        </svg>
+        <figcaption><span class="fig-label">Figure 2.2</span>The lifecycle Kubernetes manages. You own the first two steps with Docker; Kubernetes takes over from the registry onward, wrapping each container in a pod.</figcaption>
+      </figure>
+
+      <aside class="callout">
+        <div class="callout-label">Why Kubernetes doesn&rsquo;t use Docker to run containers</div>
+        <p>This surprises newcomers, especially after Kubernetes &ldquo;deprecated Docker&rdquo; made headlines. Kubernetes runs containers through the <strong>Container Runtime Interface (CRI)</strong>, and talks to a CRI-compliant runtime such as <strong>containerd</strong> or <strong>CRI-O</strong> &mdash; not to the Docker daemon. Because every image is built to the same OCI standard, an image you build with Docker runs perfectly under containerd; nothing about your images or Dockerfiles changes. Docker remains an excellent tool for <em>building</em> images and for local development &mdash; it is simply not the component that <em>executes</em> them inside a cluster.</p>
+      </aside>
+
+
       <h3>The running example we will build on</h3>
       <p>Rather than show disconnected snippets, the rest of this tutorial deploys one realistic application — a small online shop — and grows it chapter by chapter. By the end you will have taken it from a Dockerfile to a hardened, observable, autoscaling, GitOps-managed production deployment.</p>
 
@@ -632,7 +661,7 @@ aside.sidebar {
           <line x1="480" y1="105" x2="528" y2="70" class="arr" marker-end="url(#arr-c2)"/>
           <line x1="480" y1="125" x2="528" y2="165" class="arr" marker-end="url(#arr-c2)"/>
         </svg>
-        <figcaption><span class="fig-label">Figure 2.2</span>The shop: a React frontend, a FastAPI backend, a Redis cache, and a PostgreSQL database. Four workloads with different needs — stateless, stateful, cached — which is exactly why it makes a good teaching example.</figcaption>
+        <figcaption><span class="fig-label">Figure 2.3</span>The shop: a React frontend, a FastAPI backend, a Redis cache, and a PostgreSQL database. Four workloads with different needs — stateless, stateful, cached — which is exactly why it makes a good teaching example.</figcaption>
       </figure>
 
       <h3>A Dockerfile, and why multi-stage matters</h3>
@@ -783,44 +812,66 @@ docker compose ps               # what's running
 docker compose logs -f api      # follow one service's logs
 docker compose down             # stop and remove containers + networks
 docker compose down -v          # also delete named volumes</code></pre>
-      <p>Compose automatically creates a network for the project, so <code>db</code>, <code>cache</code>, and <code>api</code> find each other by name — the same discovery pattern again. The mapping to Kubernetes is almost one-to-one: each Compose <em>service</em> becomes a Deployment plus a Service, <code>environment</code> becomes a ConfigMap or Secret, <code>volumes</code> become PersistentVolumeClaims, and <code>healthcheck</code> becomes a readiness probe. Learning Compose first makes the end-to-end Kubernetes manifests later in this tutorial feel familiar rather than foreign.</p>
-      <aside class="callout">
-        <div class="callout-label">Compose is for one machine</div>
-        <p>Compose is excellent for local development and small single-server deployments, but it runs on a single host with no self-healing, no rolling updates across machines, and no horizontal scaling beyond that host. The moment you need multiple machines, high availability, or autoscaling, you have outgrown Compose — which is exactly the boundary where orchestration begins.</p>
-      </aside>
+      <p>Compose automatically creates a network for the project, so <code>db</code>, <code>cache</code>, and <code>api</code> find each other by name &mdash; the same discovery pattern again.</p>
 
-      <h3>Orchestration: from one host to many</h3>
-      <p>Everything so far runs on a single machine. <strong>Orchestration</strong> is what you need once you have many containers across many machines and want them scheduled, kept healthy, networked, scaled, and updated automatically. Docker ships its own orchestrator, <strong>Docker Swarm</strong>, which turns a group of Docker hosts into a single cluster:</p>
-      <pre><code>docker swarm init                                   # turn this host into a manager
-docker service create --name api --replicas 3 \
-  --publish 8080:8080 shop-api:1.0.0                # run 3 load-balanced copies
-docker service ls                                   # list services
-docker service scale api=5                          # scale to 5 replicas
-docker stack deploy -c compose.yaml shop            # deploy a whole Compose stack</code></pre>
-      <p>Swarm is genuinely simple — if you know Compose, you nearly know Swarm — and for a small cluster it is a reasonable choice. But the wider ecosystem, the cloud providers, and the tooling have overwhelmingly converged on <strong>Kubernetes</strong>, which offers far richer scheduling, a vast extension ecosystem, and capabilities Swarm does not match (fine-grained autoscaling, sophisticated rollout strategies, an enormous catalogue of operators and add-ons). Swarm answers the orchestration question for a single team on a few nodes; Kubernetes answers it for essentially everyone else.</p>
+      <h3>Docker &rarr; Kubernetes: a concept map</h3>
+      <p>Almost every Docker idea has a direct Kubernetes counterpart. If you are comfortable with the left column, you already have a foothold in the right one &mdash; the rest of this tutorial is largely about what each Kubernetes concept adds once you are running across many machines rather than one.</p>
+      <table class="datatable">
+        <thead><tr><th>Docker concept</th><th>Kubernetes equivalent</th><th>What changes at cluster scale</th></tr></thead>
+        <tbody>
+          <tr><td>Image</td><td>Image</td><td>Identical &mdash; the same OCI image runs in both</td></tr>
+          <tr><td>Container</td><td>Container (inside a Pod)</td><td>Wrapped in a pod, the smallest deployable unit</td></tr>
+          <tr><td><code>docker run</code></td><td>Pod (usually via a Deployment)</td><td>Scheduled onto a node automatically; recreated if it dies</td></tr>
+          <tr><td>Compose service</td><td>Deployment</td><td>Declarative replicas, rolling updates, self-healing</td></tr>
+          <tr><td>Docker network / DNS</td><td>Service + CNI</td><td>Cluster-wide discovery across every node</td></tr>
+          <tr><td>Volume</td><td>PersistentVolumeClaim</td><td>Storage that can follow a pod across nodes</td></tr>
+          <tr><td>Environment variables</td><td>ConfigMap / Secret</td><td>Centralised, versioned, separately access-controlled</td></tr>
+          <tr><td>Healthcheck</td><td>Liveness / readiness probe</td><td>Drives restarts and traffic routing automatically</td></tr>
+        </tbody>
+      </table>
+
+      <h3>From Compose to Kubernetes</h3>
+      <p>This is the key transition to internalise. <strong>Compose solves multi-container deployment on a single machine</strong>: it starts your services in the right order, wires them onto one network, and tears them down together. <strong>Kubernetes solves those same problems across many machines</strong> &mdash; and that distribution is precisely why it needs more moving parts. A Compose <em>service</em> bundles together concerns that Kubernetes deliberately separates into independent, individually scalable resources.</p>
 
       <figure>
-        <svg viewBox="0 0 660 200" role="img" aria-labelledby="figc3-title figc3-desc"><style>text{font-family:'Inter',sans-serif;}.t{font-size:14px;fill:#1a1a18;}.ts{font-size:12px;fill:#4a4a45;}.th{font-size:14px;font-weight:500;fill:#1a1a18;}.c-purple>rect,.c-purple>circle,.c-purple>ellipse{fill:#EEEDFE;stroke:#534AB7;}.c-purple>.th,.c-purple>.t{fill:#3C3489;}.c-purple>.ts{fill:#534AB7;}.c-teal>rect,.c-teal>circle,.c-teal>ellipse{fill:#E1F5EE;stroke:#0F6E56;}.c-teal>.th,.c-teal>.t{fill:#085041;}.c-teal>.ts{fill:#0F6E56;}.c-coral>rect,.c-coral>circle,.c-coral>ellipse{fill:#FAECE7;stroke:#993C1D;}.c-coral>.th,.c-coral>.t{fill:#712B13;}.c-coral>.ts{fill:#993C1D;}.c-blue>rect,.c-blue>circle,.c-blue>ellipse{fill:#E6F1FB;stroke:#185FA5;}.c-blue>.th,.c-blue>.t{fill:#0C447C;}.c-blue>.ts{fill:#185FA5;}.c-amber>rect,.c-amber>circle,.c-amber>ellipse{fill:#FAEEDA;stroke:#854F0B;}.c-amber>.th,.c-amber>.t{fill:#633806;}.c-amber>.ts{fill:#854F0B;}.c-red>rect,.c-red>circle,.c-red>ellipse{fill:#FCEBEB;stroke:#A32D2D;}.c-red>.th,.c-red>.t{fill:#791F1F;}.c-red>.ts{fill:#A32D2D;}.c-gray>rect,.c-gray>circle,.c-gray>ellipse{fill:#F1EFE8;stroke:#5F5E5A;}.c-gray>.th,.c-gray>.t{fill:#444441;}.c-gray>.ts{fill:#5F5E5A;}.arr{stroke:#4a4a45;stroke-width:1.5;fill:none;}.leader{stroke:#8a8a82;stroke-width:0.5;stroke-dasharray:3 3;fill:none;}</style>
-          <title id="figc3-title">From a single container to an orchestrated cluster</title>
-          <desc id="figc3-desc">A progression: docker run on one host, Docker Compose for multiple containers on one host, and an orchestrator for many containers across many hosts.</desc>
-          <defs>
-            <marker id="arr-c3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </marker>
-          </defs>
-          <g class="c-gray"><rect x="20" y="60" width="160" height="80" rx="8" stroke-width="0.5"/><text class="th" x="100" y="84" text-anchor="middle">docker run</text><text class="ts" x="100" y="104" text-anchor="middle">one container</text><text class="ts" x="100" y="120" text-anchor="middle">one host</text></g>
-          <g class="c-blue"><rect x="250" y="60" width="160" height="80" rx="8" stroke-width="0.5"/><text class="th" x="330" y="84" text-anchor="middle">Compose</text><text class="ts" x="330" y="104" text-anchor="middle">many containers</text><text class="ts" x="330" y="120" text-anchor="middle">one host</text></g>
-          <g class="c-teal"><rect x="480" y="60" width="160" height="80" rx="8" stroke-width="0.5"/><text class="th" x="560" y="84" text-anchor="middle">Orchestrator</text><text class="ts" x="560" y="104" text-anchor="middle">many containers</text><text class="ts" x="560" y="120" text-anchor="middle">many hosts</text></g>
-          <line x1="180" y1="100" x2="248" y2="100" class="arr" marker-end="url(#arr-c3)"/>
-          <line x1="410" y1="100" x2="478" y2="100" class="arr" marker-end="url(#arr-c3)"/>
-          <text class="ts" x="214" y="92" text-anchor="middle">scale</text>
-          <text class="ts" x="444" y="92" text-anchor="middle">distribute</text>
-          <text class="ts" x="330" y="175" text-anchor="middle">Swarm or — overwhelmingly — Kubernetes</text>
+        <svg viewBox="0 0 720 300" role="img" aria-labelledby="figfan-title figfan-desc"><style>text{font-family:'Inter',sans-serif;}.t{font-size:14px;fill:#1a1a18;}.ts{font-size:12px;fill:#4a4a45;}.th{font-size:14px;font-weight:500;fill:#1a1a18;}.c-purple>rect,.c-purple>circle,.c-purple>ellipse{fill:#EEEDFE;stroke:#534AB7;}.c-purple>.th,.c-purple>.t{fill:#3C3489;}.c-purple>.ts{fill:#534AB7;}.c-teal>rect,.c-teal>circle,.c-teal>ellipse{fill:#E1F5EE;stroke:#0F6E56;}.c-teal>.th,.c-teal>.t{fill:#085041;}.c-teal>.ts{fill:#0F6E56;}.c-coral>rect,.c-coral>circle,.c-coral>ellipse{fill:#FAECE7;stroke:#993C1D;}.c-coral>.th,.c-coral>.t{fill:#712B13;}.c-coral>.ts{fill:#993C1D;}.c-blue>rect,.c-blue>circle,.c-blue>ellipse{fill:#E6F1FB;stroke:#185FA5;}.c-blue>.th,.c-blue>.t{fill:#0C447C;}.c-blue>.ts{fill:#185FA5;}.c-amber>rect,.c-amber>circle,.c-amber>ellipse{fill:#FAEEDA;stroke:#854F0B;}.c-amber>.th,.c-amber>.t{fill:#633806;}.c-amber>.ts{fill:#854F0B;}.c-red>rect,.c-red>circle,.c-red>ellipse{fill:#FCEBEB;stroke:#A32D2D;}.c-red>.th,.c-red>.t{fill:#791F1F;}.c-red>.ts{fill:#A32D2D;}.c-gray>rect,.c-gray>circle,.c-gray>ellipse{fill:#F1EFE8;stroke:#5F5E5A;}.c-gray>.th,.c-gray>.t{fill:#444441;}.c-gray>.ts{fill:#5F5E5A;}.arr{stroke:#4a4a45;stroke-width:1.5;fill:none;}.leader{stroke:#8a8a82;stroke-width:0.5;stroke-dasharray:3 3;fill:none;}</style>
+          <title id="figfan-title">One Compose service expands into several Kubernetes resources</title>
+          <desc id="figfan-desc">A single compose.yaml fans out into Deployment, Service, ConfigMap, Secret, and PersistentVolumeClaim resources in Kubernetes.</desc>
+          <defs><marker id="arr-fan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+          <g class="c-gray"><rect x="20" y="120" width="150" height="60" rx="8" stroke-width="0.5"/><text class="th" x="95" y="146" text-anchor="middle">compose.yaml</text><text class="ts" x="95" y="164" text-anchor="middle">one service block</text></g>
+          <g class="c-blue"><rect x="410" y="6" width="304" height="44" rx="8" stroke-width="0.5"/><text class="th" x="426" y="26" text-anchor="start">Deployment</text><text class="ts" x="426" y="42" text-anchor="start">the container + replicas</text></g>
+          <g class="c-teal"><rect x="410" y="60" width="304" height="44" rx="8" stroke-width="0.5"/><text class="th" x="426" y="80" text-anchor="start">Service</text><text class="ts" x="426" y="96" text-anchor="start">stable name + load-balancing</text></g>
+          <g class="c-amber"><rect x="410" y="114" width="304" height="44" rx="8" stroke-width="0.5"/><text class="th" x="426" y="134" text-anchor="start">ConfigMap</text><text class="ts" x="426" y="150" text-anchor="start">non-secret environment</text></g>
+          <g class="c-coral"><rect x="410" y="168" width="304" height="44" rx="8" stroke-width="0.5"/><text class="th" x="426" y="188" text-anchor="start">Secret</text><text class="ts" x="426" y="204" text-anchor="start">passwords &amp; tokens</text></g>
+          <g class="c-purple"><rect x="410" y="222" width="304" height="44" rx="8" stroke-width="0.5"/><text class="th" x="426" y="242" text-anchor="start">PersistentVolumeClaim</text><text class="ts" x="426" y="258" text-anchor="start">named volumes</text></g>
+          <line x1="170" y1="150" x2="408" y2="28"  class="arr" marker-end="url(#arr-fan)"/>
+          <line x1="170" y1="150" x2="408" y2="82"  class="arr" marker-end="url(#arr-fan)"/>
+          <line x1="170" y1="150" x2="408" y2="136" class="arr" marker-end="url(#arr-fan)"/>
+          <line x1="170" y1="150" x2="408" y2="190" class="arr" marker-end="url(#arr-fan)"/>
+          <line x1="170" y1="150" x2="408" y2="244" class="arr" marker-end="url(#arr-fan)"/>
+          <text class="ts" x="300" y="285" text-anchor="middle">same intent, expressed as discrete, independently scalable resources</text>
         </svg>
-        <figcaption><span class="fig-label">Figure 2.3</span>The same workload, three scopes. Each step adds a capability the previous one lacked; Kubernetes is where the journey leads for production.</figcaption>
+        <figcaption><span class="fig-label">Figure 2.4</span>What Compose folds into one service block, Kubernetes splits into purpose-built resources &mdash; the price of, and the reason for, working across many machines.</figcaption>
       </figure>
 
-      <p>That is the handoff. You can now build an image, run and debug a container, network several together, persist their data, describe a whole application in Compose, and you understand what orchestration adds on top. Everything from here is Kubernetes doing these same jobs — scheduling, networking, configuration, storage, scaling, and updates — across a fleet of machines, declaratively and self-healingly.</p>
+      <p>Read the diagram as a promotion, not a complication: the container image and its intent are unchanged, but each concern Compose kept implicit (how many copies, how they are reached, where config and secrets come from, how data persists) becomes an explicit Kubernetes object you can scale, secure, and update on its own. Learning Compose first makes the end-to-end manifests later in this tutorial feel familiar rather than foreign.</p>
+
+      <h3>A note on Docker Swarm</h3>
+      <p>Docker has its own built-in orchestrator, <strong>Swarm</strong> (<code>docker swarm init</code>, then <code>docker service create --replicas 3</code>), which turns a group of Docker hosts into a single cluster. It is historically important and genuinely simple &mdash; if you know Compose, you nearly know Swarm. In practice, though, the ecosystem has moved on: <strong>Kubernetes became the dominant orchestrator</strong> thanks to its vast extension ecosystem, its extensibility (custom resources and operators), and near-universal cloud-provider adoption (EKS, GKE, AKS). Swarm still works for small setups, but new projects and the surrounding tooling overwhelmingly target Kubernetes, which is why the rest of this tutorial does too.</p>
+
+      <h3>The handoff: Docker vs Kubernetes</h3>
+      <p>Docker gets containers running on a machine. Kubernetes is what you add when &ldquo;a machine&rdquo; becomes &ldquo;a fleet&rdquo; and the work has to keep running without you watching it.</p>
+      <table class="datatable">
+        <thead><tr><th>Capability</th><th>Docker / Compose (one host)</th><th>Kubernetes (many hosts)</th></tr></thead>
+        <tbody>
+          <tr><td>Self-healing</td><td>Manual restart; <code>restart:</code> policy per host</td><td>Automatic &mdash; failed pods recreated, bad nodes drained</td></tr>
+          <tr><td>Scaling across machines</td><td>Limited to the one host</td><td>Schedules replicas across the whole cluster</td></tr>
+          <tr><td>Rolling updates</td><td>Not built in</td><td>Built in, with health-gated rollout and rollback</td></tr>
+          <tr><td>Service discovery</td><td>Per-host DNS on a Docker network</td><td>Cluster-wide DNS via Services and CoreDNS</td></tr>
+          <tr><td>Autoscaling</td><td>None</td><td>Horizontal, vertical, and event-driven (HPA / VPA / KEDA)</td></tr>
+        </tbody>
+      </table>
+      <p style="font-family:var(--serif);font-size:19px;line-height:1.5;color:var(--ink);margin-top:24px;">Docker teaches you how to run containers. Kubernetes teaches you how to run thousands of them reliably.</p>
     </section>
     <nav class="pager" aria-label="Chapter navigation">
       <a class="prev" href="01-why-kubernetes-exists.html"><span class="pager-dir">&#8592; Previous</span><span class="pager-title">Why Kubernetes exists</span></a>
