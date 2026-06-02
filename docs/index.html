@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kubernetes: A Comprehensive Tutorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg: #fbfaf7;
+    --bg-elevated: #ffffff;
+    --bg-code: #f3f1ec;
+    --bg-diagram: #ffffff;
+    --ink: #1a1a18;
+    --ink-soft: #4a4a45;
+    --ink-faint: #8a8a82;
+    --rule: #e5e2db;
+    --rule-soft: #ede9e0;
+    --accent: #8a3a1f;
+    --accent-soft: #f2e8e0;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  
+
+  
+
+  /* Cover */
+  
+  
+  
+  
+  
+
+  /* TOC */
+  
+  
+  
+  
+  
+  
+  
+
+  /* Main content */
+  
+
+  section.chapter {
+    margin-bottom: 88px;
+    scroll-margin-top: 32px;
+  }
+
+  .chapter-number {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 38px;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+
+  .chapter-lede {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin: 0 0 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+    max-width: 760px;
+  }
+
+  h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin: 48px 0 16px;
+    color: var(--ink);
+  }
+
+  h4 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 32px 0 12px;
+  }
+
+  p {
+    margin: 0 0 18px;
+    max-width: 760px;
+  }
+
+  p + p { margin-top: 0; }
+
+  /* Inline code */
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--bg-code);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+
+  /* Code blocks */
+  pre {
+    background: #2a2823;
+    color: #e8e4d8;
+    padding: 20px 24px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 24px 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+    font-family: var(--mono);
+    border-left: 3px solid var(--accent);
+  }
+  pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  /* Figure containers */
+  figure {
+    margin: 36px 0;
+    padding: 0;
+  }
+  figure svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--bg-diagram);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  figcaption {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-top: 12px;
+    text-align: center;
+    max-width: 100%;
+  }
+  figcaption .fig-label {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  /* Callouts */
+  aside.callout {
+    margin: 28px 0;
+    padding: 20px 24px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+  }
+  aside.callout .callout-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  aside.callout p { margin-bottom: 0; }
+  aside.callout p + p { margin-top: 12px; }
+
+  /* SVG defaults for diagrams */
+  svg text { font-family: var(--sans); }
+  .t { font-size: 14px; fill: var(--ink); }
+  .ts { font-size: 12px; fill: var(--ink-soft); }
+  .th { font-size: 14px; font-weight: 500; fill: var(--ink); }
+
+  /* Color ramps for diagrams */
+  .c-purple > rect, .c-purple > circle, .c-purple > ellipse,
+  rect.c-purple, circle.c-purple, ellipse.c-purple { fill: #EEEDFE; stroke: #534AB7; }
+  .c-purple > .th, .c-purple > .t { fill: #3C3489; }
+  .c-purple > .ts { fill: #534AB7; }
+
+  .c-teal > rect, .c-teal > circle, .c-teal > ellipse,
+  rect.c-teal, circle.c-teal, ellipse.c-teal { fill: #E1F5EE; stroke: #0F6E56; }
+  .c-teal > .th, .c-teal > .t { fill: #085041; }
+  .c-teal > .ts { fill: #0F6E56; }
+
+  .c-coral > rect, .c-coral > circle, .c-coral > ellipse,
+  rect.c-coral, circle.c-coral, ellipse.c-coral { fill: #FAECE7; stroke: #993C1D; }
+  .c-coral > .th, .c-coral > .t { fill: #712B13; }
+  .c-coral > .ts { fill: #993C1D; }
+
+  .c-blue > rect, .c-blue > circle, .c-blue > ellipse,
+  rect.c-blue, circle.c-blue, ellipse.c-blue { fill: #E6F1FB; stroke: #185FA5; }
+  .c-blue > .th, .c-blue > .t { fill: #0C447C; }
+  .c-blue > .ts { fill: #185FA5; }
+
+  .c-amber > rect, .c-amber > circle, .c-amber > ellipse,
+  rect.c-amber, circle.c-amber, ellipse.c-amber { fill: #FAEEDA; stroke: #854F0B; }
+  .c-amber > .th, .c-amber > .t { fill: #633806; }
+  .c-amber > .ts { fill: #854F0B; }
+
+  .c-red > rect, .c-red > circle, .c-red > ellipse,
+  rect.c-red, circle.c-red, ellipse.c-red { fill: #FCEBEB; stroke: #A32D2D; }
+  .c-red > .th, .c-red > .t { fill: #791F1F; }
+  .c-red > .ts { fill: #A32D2D; }
+
+  .c-gray > rect, .c-gray > circle, .c-gray > ellipse,
+  rect.c-gray, circle.c-gray, ellipse.c-gray { fill: #F1EFE8; stroke: #5F5E5A; }
+  .c-gray > .th, .c-gray > .t { fill: #444441; }
+  .c-gray > .ts { fill: #5F5E5A; }
+
+  .arr { stroke: var(--ink-soft); stroke-width: 1.5; fill: none; }
+  .leader { stroke: var(--ink-faint); stroke-width: 0.5; stroke-dasharray: 3 3; fill: none; }
+
+  /* Data tables */
+  table.datatable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 28px 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  table.datatable th,
+  table.datatable td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  table.datatable thead th {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border-bottom: 1.5px solid var(--rule);
+  }
+  table.datatable tbody tr:last-child td { border-bottom: none; }
+  table.datatable code { font-size: 0.85em; }
+
+  /* Footer */
+  
+  
+
+
+/* ---- SVG diagram palette (applies to all pages) ---- */
+svg text { font-family: var(--sans); }
+.t  { font-size: 14px; fill: var(--ink); }
+.ts { font-size: 12px; fill: var(--ink-soft); }
+.th { font-size: 14px; font-weight: 500; fill: var(--ink); }
+.c-purple > rect, .c-purple > circle, .c-purple > ellipse { fill:#EEEDFE; stroke:#534AB7; }
+.c-purple > .th, .c-purple > .t { fill:#3C3489; } .c-purple > .ts { fill:#534AB7; }
+.c-teal > rect, .c-teal > circle, .c-teal > ellipse { fill:#E1F5EE; stroke:#0F6E56; }
+.c-teal > .th, .c-teal > .t { fill:#085041; } .c-teal > .ts { fill:#0F6E56; }
+.c-coral > rect, .c-coral > circle, .c-coral > ellipse { fill:#FAECE7; stroke:#993C1D; }
+.c-coral > .th, .c-coral > .t { fill:#712B13; } .c-coral > .ts { fill:#993C1D; }
+.c-blue > rect, .c-blue > circle, .c-blue > ellipse { fill:#E6F1FB; stroke:#185FA5; }
+.c-blue > .th, .c-blue > .t { fill:#0C447C; } .c-blue > .ts { fill:#185FA5; }
+.c-amber > rect, .c-amber > circle, .c-amber > ellipse { fill:#FAEEDA; stroke:#854F0B; }
+.c-amber > .th, .c-amber > .t { fill:#633806; } .c-amber > .ts { fill:#854F0B; }
+.c-red > rect, .c-red > circle, .c-red > ellipse { fill:#FCEBEB; stroke:#A32D2D; }
+.c-red > .th, .c-red > .t { fill:#791F1F; } .c-red > .ts { fill:#A32D2D; }
+.c-gray > rect, .c-gray > circle, .c-gray > ellipse { fill:#F1EFE8; stroke:#5F5E5A; }
+.c-gray > .th, .c-gray > .t { fill:#444441; } .c-gray > .ts { fill:#5F5E5A; }
+
+
+/* ===================== Multi-page site layout ===================== */
+body { margin: 0; }
+
+.site {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: 100vh;
+}
+
+/* ---- Sidebar ---- */
+aside.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg-elevated);
+  border-right: 1px solid var(--rule);
+  padding: 32px 24px 48px;
+}
+.sidebar .brand {
+  display: block;
+  text-decoration: none;
+  margin-bottom: 28px;
+}
+.sidebar .brand .brand-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.sidebar .brand .brand-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.sidebar .brand .brand-title em { font-style: italic; color: var(--accent); }
+.sidebar .toc-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 24px 0 12px;
+}
+.sidebar nav ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: toc;
+}
+.sidebar nav ol li { counter-increment: toc; margin: 0; }
+.sidebar nav ol li a {
+  display: block;
+  position: relative;
+  padding: 7px 10px 7px 40px;
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.12s, color 0.12s;
+}
+.sidebar nav ol li a::before {
+  content: counter(toc, decimal-leading-zero);
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+.sidebar nav ol li a:hover { background: var(--bg-code); color: var(--accent); }
+.sidebar nav ol li a.current {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.sidebar nav ol li a.current::before { color: var(--accent); }
+
+/* ---- Content column ---- */
+.content {
+  min-width: 0;
+  padding: 56px 72px 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ---- Prev / next pager ---- */
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 64px 0 24px;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule);
+}
+.pager a {
+  flex: 1;
+  text-decoration: none;
+  padding: 14px 18px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  color: var(--ink-soft);
+  transition: border-color 0.12s, color 0.12s;
+}
+.pager a:hover { border-color: var(--accent); color: var(--accent); }
+.pager a.next { text-align: right; }
+.pager .pager-dir {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 4px;
+}
+.pager .pager-title { font-family: var(--serif); font-size: 15px; color: inherit; }
+.pager a.disabled { visibility: hidden; }
+
+/* ---- Page footer ---- */
+.page-footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-faint);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.page-footer .foot-row { margin-bottom: 6px; }
+.page-footer .foot-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-right: 8px;
+}
+.page-footer a { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 2px; }
+.page-footer a:hover { color: var(--accent); }
+.page-footer .copyright { margin-top: 10px; color: var(--ink-faint); }
+
+/* ---- Mobile drawer ---- */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 14px; left: 14px;
+  z-index: 30;
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.scrim {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 19;
+}
+
+@media (max-width: 880px) {
+  .site { grid-template-columns: 1fr; }
+  .menu-toggle { display: block; }
+  aside.sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 20;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 2px 0 16px rgba(0,0,0,0.08);
+  }
+  body.nav-open aside.sidebar { transform: translateX(0); }
+  body.nav-open .scrim { display: block; }
+  .content { padding: 64px 22px 24px; max-width: 100%; }
+}
+
+/* ---- Index / cover page ---- */
+.cover-hero { padding: 24px 0 8px; }
+.cover-hero .eyebrow {
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 24px;
+}
+.cover-hero h1 {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(36px, 5vw, 58px); line-height: 1.05;
+  letter-spacing: -0.02em; margin: 0 0 24px; color: var(--ink);
+}
+.cover-hero h1 em { font-style: italic; color: var(--accent); }
+.cover-hero .lede {
+  font-family: var(--serif); font-size: 21px; line-height: 1.5;
+  color: var(--ink-soft); max-width: 640px; margin: 0 0 40px;
+}
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 32px;
+}
+.chapter-card {
+  display: block;
+  text-decoration: none;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 18px 20px;
+  transition: border-color 0.12s, transform 0.12s;
+}
+.chapter-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.chapter-card .num {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em;
+  color: var(--accent); display: block; margin-bottom: 6px;
+}
+.chapter-card .title {
+  font-family: var(--serif); font-size: 18px; color: var(--ink); line-height: 1.25;
+}
+.start-btn {
+  display: inline-block; margin-top: 8px;
+  background: var(--accent); color: #fff; text-decoration: none;
+  font-family: var(--sans); font-weight: 600; font-size: 15px;
+  padding: 12px 22px; border-radius: 8px;
+}
+
+</style>
+</head>
+<body>
+<div class="site">
+  <button class="menu-toggle" aria-label="Toggle chapters menu">&#9776; Chapters</button>
+  <div class="scrim"></div>
+  <aside class="sidebar">
+    <a class="brand" href="index.html">
+      <div class="brand-eyebrow">A Tutorial · for Linux Deployment</div>
+      <div class="brand-title">Kubernetes,<br><em>first principles</em> to production</div>
+    </a>
+    <div class="toc-label">Contents</div>
+    <nav aria-label="Chapters">
+      <ol>
+        <li><a href="01-why-kubernetes-exists.html">Why Kubernetes exists</a></li>
+        <li><a href="02-containers-and-docker.html">Containers &amp; Docker</a></li>
+        <li><a href="03-architecture-and-the-control-loop.html">Architecture &amp; the control loop</a></li>
+        <li><a href="04-setting-up-your-environment.html">Setting up your environment</a></li>
+        <li><a href="05-pods-deployments-and-the-workload.html">Pods, deployments &amp; the workload hierarchy</a></li>
+        <li><a href="06-beyond-deployments-daemonsets-jobs-and.html">Beyond Deployments: DaemonSets, Jobs &amp; CronJobs</a></li>
+        <li><a href="07-networking-services-and-ingress.html">Networking, services &amp; ingress</a></li>
+        <li><a href="08-configuration-and-secrets.html">Configuration &amp; secrets</a></li>
+        <li><a href="09-persistent-storage.html">Persistent storage</a></li>
+        <li><a href="10-scaling-your-application.html">Scaling your application</a></li>
+        <li><a href="11-reliability-and-rolling-updates.html">Reliability &amp; rolling updates</a></li>
+        <li><a href="12-security-hardening.html">Security hardening</a></li>
+        <li><a href="13-observability-and-debugging.html">Observability &amp; debugging</a></li>
+        <li><a href="14-gitops-and-ci-cd.html">GitOps &amp; CI/CD</a></li>
+        <li><a href="15-end-to-end-deployment.html">End-to-end deployment</a></li>
+        <li><a href="16-production-checklist-and-maturity-model.html">Production checklist &amp; maturity model</a></li>
+        <li><a href="17-troubleshooting.html">Troubleshooting</a></li>
+        <li><a href="18-where-to-go-next.html">Where to go next</a></li>
+      </ol>
+    </nav>
+  </aside>
+  <main class="content">
+    <div class="cover-hero">
+      <div class="eyebrow">A Tutorial · for Linux Deployment</div>
+      <h1>Kubernetes,<br><em>from first principles</em><br>to production.</h1>
+      <p class="lede">A guided tour of the platform that runs most of the modern internet — explained through diagrams, executable YAML, and the reasoning that connects them. Revised for the current Kubernetes landscape (v1.34&ndash;1.36, Gateway API, and the ingress-nginx retirement).</p>
+      <a class="start-btn" href="01-why-kubernetes-exists.html">Start reading &#8594;</a>
+    </div>
+    <div class="toc-label" style="font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-faint);margin:48px 0 4px;">All chapters</div>
+    <div class="chapter-grid">
+        <a class="chapter-card" href="01-why-kubernetes-exists.html"><span class="num">Chapter 01</span><span class="title">Why Kubernetes exists</span></a>
+        <a class="chapter-card" href="02-containers-and-docker.html"><span class="num">Chapter 02</span><span class="title">Containers &amp; Docker</span></a>
+        <a class="chapter-card" href="03-architecture-and-the-control-loop.html"><span class="num">Chapter 03</span><span class="title">Architecture &amp; the control loop</span></a>
+        <a class="chapter-card" href="04-setting-up-your-environment.html"><span class="num">Chapter 04</span><span class="title">Setting up your environment</span></a>
+        <a class="chapter-card" href="05-pods-deployments-and-the-workload.html"><span class="num">Chapter 05</span><span class="title">Pods, deployments &amp; the workload hierarchy</span></a>
+        <a class="chapter-card" href="06-beyond-deployments-daemonsets-jobs-and.html"><span class="num">Chapter 06</span><span class="title">Beyond Deployments: DaemonSets, Jobs &amp; CronJobs</span></a>
+        <a class="chapter-card" href="07-networking-services-and-ingress.html"><span class="num">Chapter 07</span><span class="title">Networking, services &amp; ingress</span></a>
+        <a class="chapter-card" href="08-configuration-and-secrets.html"><span class="num">Chapter 08</span><span class="title">Configuration &amp; secrets</span></a>
+        <a class="chapter-card" href="09-persistent-storage.html"><span class="num">Chapter 09</span><span class="title">Persistent storage</span></a>
+        <a class="chapter-card" href="10-scaling-your-application.html"><span class="num">Chapter 10</span><span class="title">Scaling your application</span></a>
+        <a class="chapter-card" href="11-reliability-and-rolling-updates.html"><span class="num">Chapter 11</span><span class="title">Reliability &amp; rolling updates</span></a>
+        <a class="chapter-card" href="12-security-hardening.html"><span class="num">Chapter 12</span><span class="title">Security hardening</span></a>
+        <a class="chapter-card" href="13-observability-and-debugging.html"><span class="num">Chapter 13</span><span class="title">Observability &amp; debugging</span></a>
+        <a class="chapter-card" href="14-gitops-and-ci-cd.html"><span class="num">Chapter 14</span><span class="title">GitOps &amp; CI/CD</span></a>
+        <a class="chapter-card" href="15-end-to-end-deployment.html"><span class="num">Chapter 15</span><span class="title">End-to-end deployment</span></a>
+        <a class="chapter-card" href="16-production-checklist-and-maturity-model.html"><span class="num">Chapter 16</span><span class="title">Production checklist &amp; maturity model</span></a>
+        <a class="chapter-card" href="17-troubleshooting.html"><span class="num">Chapter 17</span><span class="title">Troubleshooting</span></a>
+        <a class="chapter-card" href="18-where-to-go-next.html"><span class="num">Chapter 18</span><span class="title">Where to go next</span></a>
+    </div>
+    <footer class="page-footer">
+      <div class="foot-row"><span class="foot-label">References</span>Based on the official <a href="https://kubernetes.io/docs/" target="_blank" rel="noopener">Kubernetes documentation</a> and <a href="https://www.cncf.io/" target="_blank" rel="noopener">CNCF</a> project resources. Verify version-specific details against the current upstream docs.</div>
+      <div class="foot-row"><span class="foot-label">Contribute</span>Spotted an error or something out of date? <a href="https://github.com/saleh-sha/K8s-Tutorial/issues" target="_blank" rel="noopener">Open an issue</a> or <a href="https://github.com/saleh-sha/K8s-Tutorial" target="_blank" rel="noopener">view the source</a>.</div>
+      <div class="copyright">&copy; 2026 SHA. All rights reserved.</div>
+    </footer>
+  </main>
+</div>
+  <script>
+    (function () {
+      var t = document.querySelector('.menu-toggle');
+      var s = document.querySelector('.scrim');
+      function close(){ document.body.classList.remove('nav-open'); }
+      if (t) t.addEventListener('click', function(){ document.body.classList.toggle('nav-open'); });
+      if (s) s.addEventListener('click', close);
+      // close drawer after picking a chapter on mobile
+      document.querySelectorAll('.sidebar nav a').forEach(function(a){
+        a.addEventListener('click', close);
+      });
+    })();
+  </script>
+</body>
+</html>

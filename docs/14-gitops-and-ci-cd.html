@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitOps & CI/CD · Kubernetes Tutorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg: #fbfaf7;
+    --bg-elevated: #ffffff;
+    --bg-code: #f3f1ec;
+    --bg-diagram: #ffffff;
+    --ink: #1a1a18;
+    --ink-soft: #4a4a45;
+    --ink-faint: #8a8a82;
+    --rule: #e5e2db;
+    --rule-soft: #ede9e0;
+    --accent: #8a3a1f;
+    --accent-soft: #f2e8e0;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  
+
+  
+
+  /* Cover */
+  
+  
+  
+  
+  
+
+  /* TOC */
+  
+  
+  
+  
+  
+  
+  
+
+  /* Main content */
+  
+
+  section.chapter {
+    margin-bottom: 88px;
+    scroll-margin-top: 32px;
+  }
+
+  .chapter-number {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 38px;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+
+  .chapter-lede {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin: 0 0 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+    max-width: 760px;
+  }
+
+  h3 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin: 48px 0 16px;
+    color: var(--ink);
+  }
+
+  h4 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 32px 0 12px;
+  }
+
+  p {
+    margin: 0 0 18px;
+    max-width: 760px;
+  }
+
+  p + p { margin-top: 0; }
+
+  /* Inline code */
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: var(--bg-code);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+
+  /* Code blocks */
+  pre {
+    background: #2a2823;
+    color: #e8e4d8;
+    padding: 20px 24px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 24px 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+    font-family: var(--mono);
+    border-left: 3px solid var(--accent);
+  }
+  pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  /* Figure containers */
+  figure {
+    margin: 36px 0;
+    padding: 0;
+  }
+  figure svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--bg-diagram);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  figcaption {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-top: 12px;
+    text-align: center;
+    max-width: 100%;
+  }
+  figcaption .fig-label {
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  /* Callouts */
+  aside.callout {
+    margin: 28px 0;
+    padding: 20px 24px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+  }
+  aside.callout .callout-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  aside.callout p { margin-bottom: 0; }
+  aside.callout p + p { margin-top: 12px; }
+
+  /* SVG defaults for diagrams */
+  svg text { font-family: var(--sans); }
+  .t { font-size: 14px; fill: var(--ink); }
+  .ts { font-size: 12px; fill: var(--ink-soft); }
+  .th { font-size: 14px; font-weight: 500; fill: var(--ink); }
+
+  /* Color ramps for diagrams */
+  .c-purple > rect, .c-purple > circle, .c-purple > ellipse,
+  rect.c-purple, circle.c-purple, ellipse.c-purple { fill: #EEEDFE; stroke: #534AB7; }
+  .c-purple > .th, .c-purple > .t { fill: #3C3489; }
+  .c-purple > .ts { fill: #534AB7; }
+
+  .c-teal > rect, .c-teal > circle, .c-teal > ellipse,
+  rect.c-teal, circle.c-teal, ellipse.c-teal { fill: #E1F5EE; stroke: #0F6E56; }
+  .c-teal > .th, .c-teal > .t { fill: #085041; }
+  .c-teal > .ts { fill: #0F6E56; }
+
+  .c-coral > rect, .c-coral > circle, .c-coral > ellipse,
+  rect.c-coral, circle.c-coral, ellipse.c-coral { fill: #FAECE7; stroke: #993C1D; }
+  .c-coral > .th, .c-coral > .t { fill: #712B13; }
+  .c-coral > .ts { fill: #993C1D; }
+
+  .c-blue > rect, .c-blue > circle, .c-blue > ellipse,
+  rect.c-blue, circle.c-blue, ellipse.c-blue { fill: #E6F1FB; stroke: #185FA5; }
+  .c-blue > .th, .c-blue > .t { fill: #0C447C; }
+  .c-blue > .ts { fill: #185FA5; }
+
+  .c-amber > rect, .c-amber > circle, .c-amber > ellipse,
+  rect.c-amber, circle.c-amber, ellipse.c-amber { fill: #FAEEDA; stroke: #854F0B; }
+  .c-amber > .th, .c-amber > .t { fill: #633806; }
+  .c-amber > .ts { fill: #854F0B; }
+
+  .c-red > rect, .c-red > circle, .c-red > ellipse,
+  rect.c-red, circle.c-red, ellipse.c-red { fill: #FCEBEB; stroke: #A32D2D; }
+  .c-red > .th, .c-red > .t { fill: #791F1F; }
+  .c-red > .ts { fill: #A32D2D; }
+
+  .c-gray > rect, .c-gray > circle, .c-gray > ellipse,
+  rect.c-gray, circle.c-gray, ellipse.c-gray { fill: #F1EFE8; stroke: #5F5E5A; }
+  .c-gray > .th, .c-gray > .t { fill: #444441; }
+  .c-gray > .ts { fill: #5F5E5A; }
+
+  .arr { stroke: var(--ink-soft); stroke-width: 1.5; fill: none; }
+  .leader { stroke: var(--ink-faint); stroke-width: 0.5; stroke-dasharray: 3 3; fill: none; }
+
+  /* Data tables */
+  table.datatable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 28px 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  table.datatable th,
+  table.datatable td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  table.datatable thead th {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border-bottom: 1.5px solid var(--rule);
+  }
+  table.datatable tbody tr:last-child td { border-bottom: none; }
+  table.datatable code { font-size: 0.85em; }
+
+  /* Footer */
+  
+  
+
+
+/* ---- SVG diagram palette (applies to all pages) ---- */
+svg text { font-family: var(--sans); }
+.t  { font-size: 14px; fill: var(--ink); }
+.ts { font-size: 12px; fill: var(--ink-soft); }
+.th { font-size: 14px; font-weight: 500; fill: var(--ink); }
+.c-purple > rect, .c-purple > circle, .c-purple > ellipse { fill:#EEEDFE; stroke:#534AB7; }
+.c-purple > .th, .c-purple > .t { fill:#3C3489; } .c-purple > .ts { fill:#534AB7; }
+.c-teal > rect, .c-teal > circle, .c-teal > ellipse { fill:#E1F5EE; stroke:#0F6E56; }
+.c-teal > .th, .c-teal > .t { fill:#085041; } .c-teal > .ts { fill:#0F6E56; }
+.c-coral > rect, .c-coral > circle, .c-coral > ellipse { fill:#FAECE7; stroke:#993C1D; }
+.c-coral > .th, .c-coral > .t { fill:#712B13; } .c-coral > .ts { fill:#993C1D; }
+.c-blue > rect, .c-blue > circle, .c-blue > ellipse { fill:#E6F1FB; stroke:#185FA5; }
+.c-blue > .th, .c-blue > .t { fill:#0C447C; } .c-blue > .ts { fill:#185FA5; }
+.c-amber > rect, .c-amber > circle, .c-amber > ellipse { fill:#FAEEDA; stroke:#854F0B; }
+.c-amber > .th, .c-amber > .t { fill:#633806; } .c-amber > .ts { fill:#854F0B; }
+.c-red > rect, .c-red > circle, .c-red > ellipse { fill:#FCEBEB; stroke:#A32D2D; }
+.c-red > .th, .c-red > .t { fill:#791F1F; } .c-red > .ts { fill:#A32D2D; }
+.c-gray > rect, .c-gray > circle, .c-gray > ellipse { fill:#F1EFE8; stroke:#5F5E5A; }
+.c-gray > .th, .c-gray > .t { fill:#444441; } .c-gray > .ts { fill:#5F5E5A; }
+
+
+/* ===================== Multi-page site layout ===================== */
+body { margin: 0; }
+
+.site {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: 100vh;
+}
+
+/* ---- Sidebar ---- */
+aside.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg-elevated);
+  border-right: 1px solid var(--rule);
+  padding: 32px 24px 48px;
+}
+.sidebar .brand {
+  display: block;
+  text-decoration: none;
+  margin-bottom: 28px;
+}
+.sidebar .brand .brand-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.sidebar .brand .brand-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.sidebar .brand .brand-title em { font-style: italic; color: var(--accent); }
+.sidebar .toc-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 24px 0 12px;
+}
+.sidebar nav ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: toc;
+}
+.sidebar nav ol li { counter-increment: toc; margin: 0; }
+.sidebar nav ol li a {
+  display: block;
+  position: relative;
+  padding: 7px 10px 7px 40px;
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.12s, color 0.12s;
+}
+.sidebar nav ol li a::before {
+  content: counter(toc, decimal-leading-zero);
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+.sidebar nav ol li a:hover { background: var(--bg-code); color: var(--accent); }
+.sidebar nav ol li a.current {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.sidebar nav ol li a.current::before { color: var(--accent); }
+
+/* ---- Content column ---- */
+.content {
+  min-width: 0;
+  padding: 56px 72px 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ---- Prev / next pager ---- */
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 64px 0 24px;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule);
+}
+.pager a {
+  flex: 1;
+  text-decoration: none;
+  padding: 14px 18px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  color: var(--ink-soft);
+  transition: border-color 0.12s, color 0.12s;
+}
+.pager a:hover { border-color: var(--accent); color: var(--accent); }
+.pager a.next { text-align: right; }
+.pager .pager-dir {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 4px;
+}
+.pager .pager-title { font-family: var(--serif); font-size: 15px; color: inherit; }
+.pager a.disabled { visibility: hidden; }
+
+/* ---- Page footer ---- */
+.page-footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-faint);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.page-footer .foot-row { margin-bottom: 6px; }
+.page-footer .foot-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-right: 8px;
+}
+.page-footer a { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 2px; }
+.page-footer a:hover { color: var(--accent); }
+.page-footer .copyright { margin-top: 10px; color: var(--ink-faint); }
+
+/* ---- Mobile drawer ---- */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 14px; left: 14px;
+  z-index: 30;
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.scrim {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 19;
+}
+
+@media (max-width: 880px) {
+  .site { grid-template-columns: 1fr; }
+  .menu-toggle { display: block; }
+  aside.sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 20;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 2px 0 16px rgba(0,0,0,0.08);
+  }
+  body.nav-open aside.sidebar { transform: translateX(0); }
+  body.nav-open .scrim { display: block; }
+  .content { padding: 64px 22px 24px; max-width: 100%; }
+}
+
+/* ---- Index / cover page ---- */
+.cover-hero { padding: 24px 0 8px; }
+.cover-hero .eyebrow {
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 24px;
+}
+.cover-hero h1 {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(36px, 5vw, 58px); line-height: 1.05;
+  letter-spacing: -0.02em; margin: 0 0 24px; color: var(--ink);
+}
+.cover-hero h1 em { font-style: italic; color: var(--accent); }
+.cover-hero .lede {
+  font-family: var(--serif); font-size: 21px; line-height: 1.5;
+  color: var(--ink-soft); max-width: 640px; margin: 0 0 40px;
+}
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 32px;
+}
+.chapter-card {
+  display: block;
+  text-decoration: none;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 18px 20px;
+  transition: border-color 0.12s, transform 0.12s;
+}
+.chapter-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.chapter-card .num {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em;
+  color: var(--accent); display: block; margin-bottom: 6px;
+}
+.chapter-card .title {
+  font-family: var(--serif); font-size: 18px; color: var(--ink); line-height: 1.25;
+}
+.start-btn {
+  display: inline-block; margin-top: 8px;
+  background: var(--accent); color: #fff; text-decoration: none;
+  font-family: var(--sans); font-weight: 600; font-size: 15px;
+  padding: 12px 22px; border-radius: 8px;
+}
+
+</style>
+</head>
+<body>
+<div class="site">
+  <button class="menu-toggle" aria-label="Toggle chapters menu">&#9776; Chapters</button>
+  <div class="scrim"></div>
+  <aside class="sidebar">
+    <a class="brand" href="index.html">
+      <div class="brand-eyebrow">A Tutorial · for Linux Deployment</div>
+      <div class="brand-title">Kubernetes,<br><em>first principles</em> to production</div>
+    </a>
+    <div class="toc-label">Contents</div>
+    <nav aria-label="Chapters">
+      <ol>
+        <li><a href="01-why-kubernetes-exists.html">Why Kubernetes exists</a></li>
+        <li><a href="02-containers-and-docker.html">Containers &amp; Docker</a></li>
+        <li><a href="03-architecture-and-the-control-loop.html">Architecture &amp; the control loop</a></li>
+        <li><a href="04-setting-up-your-environment.html">Setting up your environment</a></li>
+        <li><a href="05-pods-deployments-and-the-workload.html">Pods, deployments &amp; the workload hierarchy</a></li>
+        <li><a href="06-beyond-deployments-daemonsets-jobs-and.html">Beyond Deployments: DaemonSets, Jobs &amp; CronJobs</a></li>
+        <li><a href="07-networking-services-and-ingress.html">Networking, services &amp; ingress</a></li>
+        <li><a href="08-configuration-and-secrets.html">Configuration &amp; secrets</a></li>
+        <li><a href="09-persistent-storage.html">Persistent storage</a></li>
+        <li><a href="10-scaling-your-application.html">Scaling your application</a></li>
+        <li><a href="11-reliability-and-rolling-updates.html">Reliability &amp; rolling updates</a></li>
+        <li><a href="12-security-hardening.html">Security hardening</a></li>
+        <li><a href="13-observability-and-debugging.html">Observability &amp; debugging</a></li>
+        <li><a href="14-gitops-and-ci-cd.html" class="current">GitOps &amp; CI/CD</a></li>
+        <li><a href="15-end-to-end-deployment.html">End-to-end deployment</a></li>
+        <li><a href="16-production-checklist-and-maturity-model.html">Production checklist &amp; maturity model</a></li>
+        <li><a href="17-troubleshooting.html">Troubleshooting</a></li>
+        <li><a href="18-where-to-go-next.html">Where to go next</a></li>
+      </ol>
+    </nav>
+  </aside>
+  <main class="content">
+    <section class="chapter">
+      <span class="chapter-number">Chapter 14</span>
+      <h2>GitOps &amp; CI/CD</h2>
+      <p class="chapter-lede">Stop running <code>kubectl apply</code> by hand. Let git be the source of truth.</p>
+
+      <p>So far every change has been applied with <code>kubectl apply</code> from a laptop. That works for learning, but in production it means cluster state lives in whoever's terminal last touched it, with no audit trail and no easy rollback. <strong>GitOps</strong> fixes this by making a git repository the single source of truth: you change YAML in git, and an in-cluster agent continuously reconciles the live cluster to match. The cluster's state is, by construction, whatever git says it should be.</p>
+
+      <h3>The pipeline, end to end</h3>
+      <p>The full path from a code change to a running update splits cleanly into two halves: <strong>CI</strong> (continuous integration) builds and verifies an artifact, and <strong>CD via GitOps</strong> deploys it. The boundary between them is the registry and the config repo.</p>
+
+      <figure>
+        <svg viewBox="0 0 700 220" role="img" aria-labelledby="figg-title figg-desc"><style>text{font-family:'Inter',sans-serif;}.t{font-size:14px;fill:#1a1a18;}.ts{font-size:12px;fill:#4a4a45;}.th{font-size:14px;font-weight:500;fill:#1a1a18;}.c-purple>rect,.c-purple>circle,.c-purple>ellipse{fill:#EEEDFE;stroke:#534AB7;}.c-purple>.th,.c-purple>.t{fill:#3C3489;}.c-purple>.ts{fill:#534AB7;}.c-teal>rect,.c-teal>circle,.c-teal>ellipse{fill:#E1F5EE;stroke:#0F6E56;}.c-teal>.th,.c-teal>.t{fill:#085041;}.c-teal>.ts{fill:#0F6E56;}.c-coral>rect,.c-coral>circle,.c-coral>ellipse{fill:#FAECE7;stroke:#993C1D;}.c-coral>.th,.c-coral>.t{fill:#712B13;}.c-coral>.ts{fill:#993C1D;}.c-blue>rect,.c-blue>circle,.c-blue>ellipse{fill:#E6F1FB;stroke:#185FA5;}.c-blue>.th,.c-blue>.t{fill:#0C447C;}.c-blue>.ts{fill:#185FA5;}.c-amber>rect,.c-amber>circle,.c-amber>ellipse{fill:#FAEEDA;stroke:#854F0B;}.c-amber>.th,.c-amber>.t{fill:#633806;}.c-amber>.ts{fill:#854F0B;}.c-red>rect,.c-red>circle,.c-red>ellipse{fill:#FCEBEB;stroke:#A32D2D;}.c-red>.th,.c-red>.t{fill:#791F1F;}.c-red>.ts{fill:#A32D2D;}.c-gray>rect,.c-gray>circle,.c-gray>ellipse{fill:#F1EFE8;stroke:#5F5E5A;}.c-gray>.th,.c-gray>.t{fill:#444441;}.c-gray>.ts{fill:#5F5E5A;}.arr{stroke:#4a4a45;stroke-width:1.5;fill:none;}.leader{stroke:#8a8a82;stroke-width:0.5;stroke-dasharray:3 3;fill:none;}</style>
+          <title id="figg-title">CI to GitOps deployment pipeline</title>
+          <desc id="figg-desc">A git commit triggers CI which builds and pushes an image and updates the config repo; a GitOps controller detects the change and applies it to the cluster.</desc>
+          <defs>
+            <marker id="arr-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+          <text class="ts" x="120" y="22" text-anchor="middle">CI (e.g. GitHub Actions)</text>
+          <line x1="20" y1="32" x2="240" y2="32" class="leader"/>
+          <text class="ts" x="480" y="22" text-anchor="middle">CD (GitOps controller in cluster)</text>
+          <line x1="300" y1="32" x2="690" y2="32" class="leader"/>
+
+          <g class="c-gray"><rect x="20" y="50" width="110" height="46" rx="8" stroke-width="0.5"/><text class="ts" x="75" y="68" text-anchor="middle">git commit</text><text class="ts" x="75" y="84" text-anchor="middle">app code</text></g>
+          <g class="c-blue"><rect x="160" y="50" width="110" height="46" rx="8" stroke-width="0.5"/><text class="ts" x="215" y="68" text-anchor="middle">build + test</text><text class="ts" x="215" y="84" text-anchor="middle">+ scan image</text></g>
+          <g class="c-purple"><rect x="160" y="130" width="110" height="46" rx="8" stroke-width="0.5"/><text class="ts" x="215" y="148" text-anchor="middle">push image</text><text class="ts" x="215" y="164" text-anchor="middle">to registry</text></g>
+          <g class="c-amber"><rect x="320" y="130" width="120" height="46" rx="8" stroke-width="0.5"/><text class="ts" x="380" y="148" text-anchor="middle">bump tag in</text><text class="ts" x="380" y="164" text-anchor="middle">config repo</text></g>
+          <g class="c-coral"><rect x="470" y="130" width="120" height="46" rx="8" stroke-width="0.5"/><text class="ts" x="530" y="148" text-anchor="middle">Argo CD / Flux</text><text class="ts" x="530" y="164" text-anchor="middle">detects change</text></g>
+          <g class="c-teal"><rect x="470" y="50" width="120" height="46" rx="8" stroke-width="0.5"/><text class="ts" x="530" y="68" text-anchor="middle">cluster updated</text><text class="ts" x="530" y="84" text-anchor="middle">reconciled</text></g>
+
+          <line x1="130" y1="73" x2="158" y2="73" class="arr" marker-end="url(#arr-g)"/>
+          <line x1="215" y1="96" x2="215" y2="128" class="arr" marker-end="url(#arr-g)"/>
+          <line x1="270" y1="153" x2="318" y2="153" class="arr" marker-end="url(#arr-g)"/>
+          <line x1="440" y1="153" x2="468" y2="153" class="arr" marker-end="url(#arr-g)"/>
+          <line x1="530" y1="128" x2="530" y2="98" class="arr" marker-end="url(#arr-g)"/>
+        </svg>
+        <figcaption><span class="fig-label">Figure 14.1</span>CI produces an image and updates a tag in git; the GitOps controller does the actual deploying. Nobody runs <code>kubectl apply</code> against production.</figcaption>
+      </figure>
+
+      <h3>The CI half</h3>
+      <p>Continuous integration takes a commit and produces a verified, pushed image. A minimal GitHub Actions workflow for the shop API:</p>
+      <pre><code>name: ci
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Log in to GHCR
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: Build
+      run: docker build -t ghcr.io/example/shop-api:${{ github.sha }} .
+    - name: Scan with Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ghcr.io/example/shop-api:${{ github.sha }}
+        exit-code: "1"
+        severity: HIGH,CRITICAL
+    - name: Push
+      run: docker push ghcr.io/example/shop-api:${{ github.sha }}</code></pre>
+      <p>Note the image is tagged with the commit SHA, not a moving tag like <code>latest</code>. Every build is uniquely and immutably identifiable, which is what makes the GitOps half auditable.</p>
+
+      <h3>The GitOps half</h3>
+      <p>The two dominant GitOps controllers are <strong>Argo CD</strong> (rich web UI, application-centric, very popular for app teams) and <strong>Flux</strong> (CNCF-graduated, controller-centric, composes well with other tooling). Both watch a git repo and apply changes; the choice is largely about whether you want a polished UI (Argo CD) or a leaner, more composable toolkit (Flux).</p>
+      <p>An Argo CD <code>Application</code> pointing at the shop's manifests:</p>
+      <pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shop
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/example/shop-config
+    targetRevision: main
+    path: manifests          # where the YAML lives
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: shop
+  syncPolicy:
+    automated:
+      prune: true            # delete resources removed from git
+      selfHeal: true         # revert manual cluster edits back to git
+    syncOptions:
+    - CreateNamespace=true</code></pre>
+      <p>With <code>selfHeal</code> on, if someone runs <code>kubectl edit</code> against production, Argo CD notices the drift from git and reverts it within seconds. The only way to change the cluster is to change git — which means every change is reviewed, attributed, and revertible with <code>git revert</code>.</p>
+
+      <h3>Why this became the standard</h3>
+      <p>GitOps wins on four counts that matter most in production: a complete <strong>audit trail</strong> (git history is your change log), trivial <strong>rollback</strong> (revert the commit), <strong>disaster recovery</strong> (rebuild a cluster by pointing a fresh controller at the same repo), and <strong>least privilege</strong> (humans need git access, not cluster credentials — the controller holds those). Combined with the CI scanning step, you get a pipeline where nothing reaches production without passing through review and automated checks.</p>
+
+      <aside class="callout">
+        <div class="callout-label">Separate the code repo from the config repo</div>
+        <p>A common pattern is two repositories: one for application source (which CI builds) and one for deployment manifests (which the GitOps controller watches). CI's last step bumps the image tag in the config repo, which triggers the deploy. This keeps a fast-moving code history separate from a deliberate, reviewable deployment history — and stops a deploy from accidentally shipping un-built code.</p>
+      </aside>
+    </section>
+    <nav class="pager" aria-label="Chapter navigation">
+      <a class="prev" href="13-observability-and-debugging.html"><span class="pager-dir">&#8592; Previous</span><span class="pager-title">Observability &amp; debugging</span></a>
+      <a class="next" href="15-end-to-end-deployment.html"><span class="pager-dir">Next &#8594;</span><span class="pager-title">End-to-end deployment</span></a>
+    </nav>
+    <footer class="page-footer">
+      <div class="foot-row"><span class="foot-label">References</span>Based on the official <a href="https://kubernetes.io/docs/" target="_blank" rel="noopener">Kubernetes documentation</a> and <a href="https://www.cncf.io/" target="_blank" rel="noopener">CNCF</a> project resources. Verify version-specific details against the current upstream docs.</div>
+      <div class="foot-row"><span class="foot-label">Contribute</span>Spotted an error or something out of date? <a href="https://github.com/saleh-sha/K8s-Tutorial/issues" target="_blank" rel="noopener">Open an issue</a> or <a href="https://github.com/saleh-sha/K8s-Tutorial" target="_blank" rel="noopener">view the source</a>.</div>
+      <div class="copyright">&copy; 2026 SHA. All rights reserved.</div>
+    </footer>
+  </main>
+</div>
+  <script>
+    (function () {
+      var t = document.querySelector('.menu-toggle');
+      var s = document.querySelector('.scrim');
+      function close(){ document.body.classList.remove('nav-open'); }
+      if (t) t.addEventListener('click', function(){ document.body.classList.toggle('nav-open'); });
+      if (s) s.addEventListener('click', close);
+      // close drawer after picking a chapter on mobile
+      document.querySelectorAll('.sidebar nav a').forEach(function(a){
+        a.addEventListener('click', close);
+      });
+    })();
+  </script>
+</body>
+</html>

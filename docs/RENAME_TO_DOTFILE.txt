@@ -1,0 +1,18 @@
+This folder contains a file named "nojekyll.txt" which must be renamed to
+".nojekyll" (a hidden file) for GitHub Pages. Your extractor may have hidden or
+skipped the original ".nojekyll", so this visible copy is provided as a backup.
+
+To rename it, run ONE of the following inside this folder:
+
+  macOS / Linux:     mv nojekyll.txt .nojekyll
+  Windows (CMD):     ren nojekyll.txt .nojekyll
+  Windows (PowerShell): Rename-Item nojekyll.txt .nojekyll
+
+Or just create it fresh:
+
+  macOS / Linux:     touch .nojekyll
+  Windows PowerShell: New-Item -ItemType File -Name ".nojekyll"
+
+NOTE: This site has NO files starting with an underscore, so .nojekyll is
+optional — the site will publish correctly even without it. It is provided
+purely as good practice.
